@@ -13,14 +13,16 @@ const initI18next = async (
     .use(
       resourcesToBackend(
         (language: string, namespace: string) =>
-          import(`./locales/${language}/${namespace}.json`),
+          import(
+            `../../i18n/locales/${language}/${namespace}.json`
+          ),
       ),
     )
     .init(getOptions(lng, ns));
   return i18nInstance;
 };
 
-export const useTranslationHook = async (
+export const useTranslationServer = async (
   lng: string,
   ns: string[] | string,
   options: { keyPrefix?: any } = {},

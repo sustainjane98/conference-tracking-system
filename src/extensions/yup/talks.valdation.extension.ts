@@ -1,8 +1,9 @@
 import { addMethod, string } from 'yup';
+import { talksRegex } from '@/regex/talks.regex';
 
 addMethod(string, 'talk', function talk(msg: string) {
-  return this.matches(
-    /^[A-Za-zÄÖÜäöü\s]+\s\d{2}\s?(seconds?|sec|s|minutes?|min|m|h|hours?)$/gm,
-    { name: 'talk', message: msg },
-  );
+  return this.matches(talksRegex, {
+    name: 'talk',
+    message: msg,
+  });
 });

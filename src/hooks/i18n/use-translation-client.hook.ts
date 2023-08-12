@@ -20,7 +20,9 @@ i18next
   .use(
     resourcesToBackend(
       (language: string, namespace: string) =>
-        import(`./locales/${language}/${namespace}.json`),
+        import(
+          `../../i18n/locales/${language}/${namespace}.json`
+        ),
     ),
   )
   .init({
@@ -32,10 +34,10 @@ i18next
     preload: runsOnServerSide ? languages : [],
   });
 
-export function useTranslation(
+export function useTranslationClient(
   lng: string,
   ns: Namespaces[] | Namespaces,
-  options: {},
+  options: {} = {},
 ) {
   const ret = useTranslationOrg(ns, options);
   const { i18n } = ret;
