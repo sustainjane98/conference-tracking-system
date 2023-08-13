@@ -1,0 +1,46 @@
+{
+  "name": "@conference-tracking-system/frontend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/frontend",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "production",
+      "options": {
+        "cwd": "apps/frontend",
+        "command": "next build"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "defaultConfiguration": "development",
+      "options": {
+        "cwd": "apps/frontend"
+      },
+      "configurations": {
+        "development": {
+          "command": "next dev -p 3000"
+        },
+        "production": {
+          "command": "next start -p 4200",
+          "parallel": false
+        }
+      }
+    },
+    "export": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "next export"
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/frontend/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "tags": []
+}

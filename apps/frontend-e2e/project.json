@@ -1,0 +1,43 @@
+{
+  "name": "@conference-tracking-system/frontend-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@ns3/nx-playwright:playwright",
+      "options": {
+        "command": "playwright test",
+        "config": "apps/frontend-e2e/playwright.config.ts"
+      },
+      "configurations": {
+        "debug": {
+          "debug": true,
+          "headed": true
+        }
+      }
+    },
+    "codegen": {
+      "executor": "@ns3/nx-playwright:playwright",
+      "options": {
+        "command": "playwright codegen http://localhost:3000"
+      }
+    },
+    "show-report": {
+      "executor": "@ns3/nx-playwright:playwright",
+      "options": {
+        "command": "playwright show-report"
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "apps/frontend-e2e/**/*.{js,ts}"
+        ]
+      }
+    }
+  },
+  "tags": []
+}
