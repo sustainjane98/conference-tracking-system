@@ -1,8 +1,8 @@
 'use client';
 
 import { FunctionComponent } from 'react';
-import { Button, Label, TextInput } from 'flowbite-react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Button } from 'flowbite-react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import '../../../extensions/yup/talks.valdation.extension';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,6 +13,7 @@ import { Translations } from '../../../enums/i18n/translation.enum';
 import TalksService from '../../../services/talks.service';
 import { useConferenceContext } from '../../../hooks/talks/use-conference-context';
 import { DataTestIds } from '@conference-tracking-system/frontend/tests';
+import { TextInput } from '../../common/text-input';
 
 const talksValidationSchema = yup
   .object({
@@ -27,9 +28,10 @@ export interface TalkEntryFormData {
 export const TalkEntryForm: FunctionComponent<GlobalPageParams> = ({ lng }) => {
   const { t } = useTranslationClient(lng, [Namespaces.TALKS]);
 
-  const { register, handleSubmit, reset } = useForm<TalkEntryFormData>({
-    resolver: yupResolver(talksValidationSchema),
-  });
+  const { register, handleSubmit, reset, ...otherFormValues } =
+    useForm<TalkEntryFormData>({
+      resolver: yupResolver(talksValidationSchema),
+    });
 
   const conferenceContext = useConferenceContext();
 
@@ -48,31 +50,41 @@ export const TalkEntryForm: FunctionComponent<GlobalPageParams> = ({ lng }) => {
   };
 
   return (
-    <form
-      className="flex flex-1 flex-col justify-center items-center h-full"
-      onSubmit={handleSubmit(onSubmit)}
+    <FormProvider
+      register={register}
+      reset={reset}
+      handleSubmit={handleSubmit}
+      {...otherFormValues}
     >
-      <div className="mb-2 block w-full">
-        <Label
-          htmlFor="talk"
-          value={t(Translations.TALKS.INSERT_APPOINTMENT)}
-        />
-        <TextInput
-          {...register('talk')}
-          data-test-id={DataTestIds.INDEX.TALK_ENTRY_INPUT}
-          id="talk"
-          className="mb-4"
-          placeholder={t(
-            Translations.TALKS
-              .WRITING_FAST_TESTS_AGAINST_ENTERPRISE_RAILS_60_MIN
-          )}
-          required
-          type="text"
-        />
-      </div>
-      <Button data-test-id={DataTestIds.INDEX.TALK_ENTRY_SUBMIT} type="submit">
-        {t(Translations.TALKS.CLICK)}
-      </Button>
-    </form>
+      <form
+        className="flex flex-1 flex-col justify-center items-center h-full"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div className="block w-full mb-8">
+          <TextInput
+            label={{
+              htmlFor: 'talk',
+              value: t(Translations.TALKS.INSERT_APPOINTMENT),
+            }}
+            {...register('talk')}
+            data-test-id={DataTestIds.INDEX.TALK_ENTRY_INPUT}
+            id="talk"
+            name={'talk'}
+            placeholder={t(
+              Translations.TALKS
+                .WRITING_FAST_TESTS_AGAINST_ENTERPRISE_RAILS_60_MIN
+            )}
+            required
+            type="text"
+          />
+        </div>
+        <Button
+          data-test-id={DataTestIds.INDEX.TALK_ENTRY_SUBMIT}
+          type="submit"
+        >
+          {t(Translations.TALKS.CLICK)}
+        </Button>
+      </form>
+    </FormProvider>
   );
 };

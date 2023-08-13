@@ -8,9 +8,12 @@ const config: PlaywrightTestConfig = {
   /* Retry on CI only */
   retries: process.env['CI'] ? 2 : 0,
 
-  outputDir: '../../dist/frontend-e2e',
+  outputDir: '../../dist/apps/frontend-e2e/test-results',
 
-  reporter: [['list'], ['html']],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: '../../dist/apps/frontend-e2e/html' }],
+  ],
 
   /* Opt out of parallel tests on CI. */
   workers: process.env['CI'] ? 1 : undefined,
