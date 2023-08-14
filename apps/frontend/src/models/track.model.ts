@@ -3,11 +3,14 @@ import { SessionFactory } from '../services/factories/session-factory.service';
 import { Talk } from './talk.model';
 import { Session } from './session.model';
 import dayjs from 'dayjs';
+import { TrackState } from '../enums/track-state.enum';
 
 export default class Track {
   private static counter = 0;
 
   public id: number;
+
+  public state: TrackState = TrackState.EMPTY;
 
   private sessionFactory = new SessionFactory();
 
@@ -33,7 +36,14 @@ export default class Track {
       this.isSessionDurationGreaterOrEqualsTalkDuration(eveningSession, talk)
     ) {
       return this.addTalkToSession(eveningSession, talk);
+    } else {
+      for (const session of Object.values(this.sessions)) {
+        if (this.addIfSessionHasMatchingDurationSlot(talk, session)) {
+          return true;
+        }
+      }
     }
+
     return false;
   }
 
@@ -44,13 +54,44 @@ export default class Track {
     return session.duration >= (talk.duration ?? 0);
   }
 
-  private addTalkToSession(session: Session, talk: Talk): boolean {
-    talk.start = session.currentTime;
-    talk.end = dayjs(session.currentTime)
-      .add(talk.duration ?? 0, 'minute')
+  private addIfSessionHasMatchingDurationSlot(talk: Talk, session: Session) {
+    for (const sessionTalk of session.talks) {
+      if (!talk.duration) {
+        break;
+      }
+      if (sessionTalk.durationAfter >= (talk.duration ?? 0)) {
+        sessionTalk.append(talk);
+        sessionTalk.durationAfter -= talk.duration;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private addTalkToSession(session: Session, currentTalk: Talk): boolean {
+    currentTalk.start = session.currentTime;
+    currentTalk.end = dayjs(session.currentTime)
+      .add(currentTalk.duration ?? 0, 'minute')
       .toDate();
-    session.talks.push(talk);
-    session.duration -= talk?.duration ?? 0;
+    const previousTalk = session.talks?.toArray()[session.talks.size - 1];
+
+    if (previousTalk)
+      previousTalk.durationAfter = this.getDurationBetween(
+        currentTalk,
+        previousTalk
+      );
+
+    if (previousTalk?.durationAfter > 0) {
+      this.state = TrackState.SPACE_BETWEEN;
+    }
+
+    session.talks.append(currentTalk);
+    session.duration -= currentTalk?.duration ?? 0;
     return true;
+  }
+
+  private getDurationBetween(currentTalk: Talk, previousTalk: Talk) {
+    if (!previousTalk.end) return 0;
+    return dayjs(currentTalk.start).diff(previousTalk.end, 'minute');
   }
 }

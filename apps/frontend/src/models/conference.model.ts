@@ -1,18 +1,20 @@
 import Track from '../models/track.model';
+import { TrackState } from '../enums/track-state.enum';
 
 const conference = {
-  tracks: new Map<Track, boolean>([]),
+  tracks: new Set<Track>([]),
 
   setTrackToFinished(track: Track) {
-    this.tracks.set(track, true);
+    track.state = TrackState.FULL;
+    this.tracks.add(track);
   },
 
   openTracks() {
-    const openTracks: { key: Track; value: boolean }[] = [];
+    const openTracks: typeof this.tracks = new Set();
 
-    for (const [key, value] of this.tracks.entries()) {
-      if (!value) {
-        openTracks.push({ key, value });
+    for (const track of this.tracks) {
+      if (track.state !== TrackState.FULL) {
+        openTracks.add(track);
       }
     }
 

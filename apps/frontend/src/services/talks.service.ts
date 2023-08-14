@@ -3,6 +3,7 @@ import { Talk } from '../models/talk.model';
 import Track from '../models/track.model';
 import { SessionType } from '../enums/talks/session-type.enum';
 import dayjs from 'dayjs';
+import { List } from 'linked-list';
 
 export default class TalksService {
   public async extractTitleAndDuration(talkString: string) {
@@ -37,7 +38,7 @@ export default class TalksService {
   }
 
   private processTalks(
-    talks: Talk[],
+    talks: List<Talk>,
     lastTalkEndDate?: Date
   ): {
     tracksString: string;
@@ -45,10 +46,10 @@ export default class TalksService {
   } {
     let tracksString = '';
 
-    for (const [index, talk] of talks.entries()) {
+    for (const [index, talk] of talks.toArray().entries()) {
       tracksString = this.addTalkString(tracksString, talk);
 
-      if (index === talks.length - 1) {
+      if (index === talks.size - 1) {
         lastTalkEndDate = talk.end;
       }
     }
