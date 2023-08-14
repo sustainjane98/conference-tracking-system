@@ -21,6 +21,8 @@ test.describe('Index Page', () => {
     const processingAreaArray =
       await indexPage.getValueArrayInTextProcessingArea();
 
-    expect(processingAreaArray?.[4]).toEqual(fillTask);
+    expect(processingAreaArray?.[13]).toMatch(
+      new RegExp(`^\\d+:\\d+\\s(AM|PM)\\s${fillTask.replace(/\s+/gm, '\\s')}$`)
+    );
   });
 });

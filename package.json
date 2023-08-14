@@ -24,6 +24,7 @@
     "i18next": "^23.4.4",
     "i18next-browser-languagedetector": "^7.1.0",
     "i18next-resources-to-backend": "^1.1.4",
+    "linked-list": "^3.1.0",
     "merge-refs": "^1.2.1",
     "next": "13.4.1",
     "object-hash": "^3.0.0",

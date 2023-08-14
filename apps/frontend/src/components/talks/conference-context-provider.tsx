@@ -4,6 +4,7 @@ import React, { FunctionComponent, PropsWithChildren, useState } from 'react';
 import conferenceModel from '../../models/conference.model';
 import { Talk } from '../../models/talk.model';
 import Track from '../../models/track.model';
+import { TrackState } from '../../enums/track-state.enum';
 
 export type ConferenceContext = typeof conferenceModel;
 
@@ -29,10 +30,13 @@ export const ConferenceContextProvider: FunctionComponent<
   const [talksContextState, setTalksContextState] =
     useState<ConferenceContext>(initalData);
 
-  const _createNewTrackAndAdd = (talk: Talk, tracks: Map<Track, boolean>) => {
+  const _createNewTrackAndAdd = (
+    talk: Talk,
+    tracks: (typeof conferenceModel)['tracks']
+  ) => {
     const newTrack = new Track();
     newTrack.addTalk(talk);
-    tracks.set(newTrack, false);
+    tracks.add(newTrack);
   };
 
   return (
@@ -42,17 +46,19 @@ export const ConferenceContextProvider: FunctionComponent<
         addTalk(talk: Talk) {
           const openTracks = talksContextState.openTracks();
 
-          if (openTracks.length === 0) {
+          if (openTracks.size === 0) {
             _createNewTrackAndAdd(talk, talksContextState.tracks);
             setTalksContextState((prev) => ({ ...prev }));
             return;
           }
 
-          const firstOpenTrack = openTracks?.[0];
-          const successful = firstOpenTrack.key.addTalk(talk);
+          const firstOpenTrack = openTracks.keys()?.next().value as Track;
+          const successful = firstOpenTrack.addTalk(talk);
 
           if (!successful) {
-            talksContextState.setTrackToFinished(firstOpenTrack?.key);
+            if (firstOpenTrack.state === TrackState.EMPTY) {
+              talksContextState.setTrackToFinished(firstOpenTrack);
+            }
             _createNewTrackAndAdd(talk, talksContextState.tracks);
           }
 

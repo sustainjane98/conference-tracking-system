@@ -3,6 +3,7 @@ import { Talk } from '../models/talk.model';
 import Track from '../models/track.model';
 import { SessionType } from '../enums/talks/session-type.enum';
 import dayjs from 'dayjs';
+import { List } from 'linked-list';
 
 export default class TalksService {
   public async extractTitleAndDuration(talkString: string) {
@@ -37,7 +38,7 @@ export default class TalksService {
   }
 
   private processTalks(
-    talks: Talk[],
+    talks: List<Talk>,
     lastTalkEndDate?: Date
   ): {
     tracksString: string;
@@ -45,10 +46,10 @@ export default class TalksService {
   } {
     let tracksString = '';
 
-    for (const [index, talk] of talks.entries()) {
+    for (const [index, talk] of talks.toArray().entries()) {
       tracksString = this.addTalkString(tracksString, talk);
 
-      if (index === talks.length - 1) {
+      if (index === talks.size - 1) {
         lastTalkEndDate = talk.end;
       }
     }
@@ -56,38 +57,16 @@ export default class TalksService {
     return { tracksString, lastTalkEndDate };
   }
 
-  private ensureThatDateIsNotSmallerThan16OClock(
-    date: Date | undefined
-  ): Date | undefined {
-    if ((date?.getHours() ?? 0) < 16) {
-      return dayjs().hour(16).minute(0).second(0).toDate();
-    }
-
-    return date;
-  }
-
-  private addLaunch(tracksString: string): string {
-    return this.addTalkString(
-      tracksString,
-      new Talk(
-        'Lunch',
-        60,
-        dayjs().hour(12).minute(0).second(0).toDate(),
-        dayjs().hour(13).minute(0).second(0).toDate()
-      )
-    );
+  private addLaunch(tracksString: string, launch: Talk): string {
+    return this.addTalkString(tracksString, launch);
   }
 
   private addNetworkEvent(
     tracksString: string,
-    lastDate: Date | undefined
-  ): string {
-    lastDate = this.ensureThatDateIsNotSmallerThan16OClock(lastDate);
 
-    return this.addTalkString(
-      tracksString,
-      new Talk('Networking Event', undefined, lastDate)
-    );
+    networkEvent: Talk
+  ): string {
+    return this.addTalkString(tracksString, networkEvent);
   }
 
   public tracksToString(tracks: IterableIterator<Track>): string {
@@ -107,7 +86,7 @@ export default class TalksService {
       tracksString += morningProcessResults.tracksString;
       lastTalkBeforeNetorkingEventDate = morningProcessResults.lastTalkEndDate;
 
-      tracksString = this.addLaunch(tracksString);
+      tracksString = this.addLaunch(tracksString, track.launch);
 
       const eveningTalks = track.sessions[SessionType.EVENING].talks;
 
@@ -120,7 +99,7 @@ export default class TalksService {
       lastTalkBeforeNetorkingEventDate = eveningProcessResults.lastTalkEndDate;
       tracksString = this.addNetworkEvent(
         tracksString,
-        lastTalkBeforeNetorkingEventDate
+        track.getNetworkEvent()
       );
 
       tracksString += '\n';
