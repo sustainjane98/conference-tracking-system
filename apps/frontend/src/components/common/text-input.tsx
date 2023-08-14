@@ -1,17 +1,20 @@
 'use client';
 
-import { forwardRef, ForwardRefExoticComponent } from 'react';
-import { TextInputProps } from 'flowbite-react/lib/esm/components/TextInput/TextInput';
+import { FunctionComponent } from 'react';
+import {
+  TextInputProps,
+  TextInput as TextInputBase,
+} from 'flowbite-react/lib/esm/components/TextInput/TextInput';
 import { useFormContext } from 'react-hook-form';
-import mergeRefs from 'merge-refs';
 import { Label, LabelProps } from 'flowbite-react';
 import { ErrorMessage } from './error-message';
+import { DataTestIds } from '@conference-tracking-system/frontend/tests';
 
-export const TextInput: ForwardRefExoticComponent<
+export const TextInput: FunctionComponent<
   TextInputProps & {
     label?: LabelProps;
-  } & import('react').RefAttributes<HTMLInputElement>
-> = forwardRef(({ label, ...props }, ref) => {
+  }
+> = ({ label, ...props }) => {
   const {
     register,
     formState: { errors },
@@ -30,9 +33,16 @@ export const TextInput: ForwardRefExoticComponent<
           value={label.value}
         />
       )}
-      <TextInput {...props} {...other} ref={mergeRefs(registerRef, ref)} />
-      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+      <TextInputBase {...props} {...other} ref={registerRef} />
+      {errorMessage && (
+        <ErrorMessage
+          dataTestId={DataTestIds.INDEX.INPUT_ERROR(
+            ((props as never)?.['data-test-id'] as string) ?? ''
+          )}
+        >
+          {errorMessage}
+        </ErrorMessage>
+      )}
     </div>
   );
-});
-TextInput.displayName = 'TextInput';
+};

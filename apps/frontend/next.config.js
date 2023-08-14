@@ -3,6 +3,7 @@ const nextConfig = {
   distDir: '../../dist/apps/frontend',
   experimental: {
     typedRoutes: true,
+    externalDir: true,
   },
 };
 

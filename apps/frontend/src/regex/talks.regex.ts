@@ -1,4 +1,4 @@
-const talksTitleRegexString = '^[A-Za-zÄÖÜäöü\\s]+';
+const talksTitleRegexString = '^[A-Za-zÄÖÜäöü\\s-:().]+';
 
 export const talksTitleRegex = new RegExp(talksTitleRegexString, 'gm');
 

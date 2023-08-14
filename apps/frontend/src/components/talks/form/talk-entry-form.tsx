@@ -66,7 +66,6 @@ export const TalkEntryForm: FunctionComponent<GlobalPageParams> = ({ lng }) => {
               htmlFor: 'talk',
               value: t(Translations.TALKS.INSERT_APPOINTMENT),
             }}
-            {...register('talk')}
             data-test-id={DataTestIds.INDEX.TALK_ENTRY_INPUT}
             id="talk"
             name={'talk'}
