@@ -13,7 +13,8 @@
       "configurations": {
         "debug": {
           "debug": true,
-          "headed": true
+          "headed": true,
+          "config": "apps/frontend-e2e/playwright-debug.config.ts"
         }
       }
     },
@@ -26,7 +27,7 @@
     "show-report": {
       "executor": "@ns3/nx-playwright:playwright",
       "options": {
-        "command": "playwright show-report"
+        "command": "playwright show-report dist/apps/frontend-e2e/html"
       }
     },
     "lint": {
